@@ -14,8 +14,11 @@ type Work struct {
 	
 }
 type Aircon struct {
-	Name string `json:"name"`
-	Price int	`json:"price"`
+	CompletedDate string `json:"completedDate"`
+	RecieptNumber int    `json:"recieptNumber"`
+	Name          string `json:"name"`
+	Quantity      int    `json:"quantity"`
+	Price         int	 `json:"price"`
 	}
 type Antena struct {
 	Name string
@@ -26,12 +29,16 @@ var aircon []*Aircon
 
 // 全アイテム取得
 func getAllData(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(aircon)
 }
 
 // アイテム登録
 func createData(w http.ResponseWriter, r *http.Request){
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	reqBody,_ := ioutil.ReadAll(r.Body)
 
 	var item Aircon
@@ -42,12 +49,27 @@ func createData(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(item)
 }
 
+func handleCORS(handle http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		log.Println(r)
+		w.Header().Set("Access-Control-Allow-Headers","Content-Type")
+		w.Header().Set("Access-Control-Allow-origin","*")
+		w.Header().Set("Access-Control-Allow-Methods","GET, POST,PUT, DELETE, OPTIONS")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		handle.ServeHTTP(w, r)
+		return
+	})
+}
+
 func StartWebServer() error {
 	fmt.Println("Rest Api Server Start......")
 	router := mux.NewRouter().StrictSlash(true)
-
+	router.Use(handleCORS)
 	router.HandleFunc("/items",getAllData).Methods("GET")
-	router.HandleFunc("/item",createData).Methods("POST")
+	router.HandleFunc("/item",createData)
 	return http.ListenAndServe(fmt.Sprintf(":%d",8080),router)
 }
 
