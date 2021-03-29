@@ -14,24 +14,26 @@ type Work struct {
 	
 }
 type Aircon struct {
+	// ID            int    `json:"id"`
 	CompletedDate string `json:"completedDate"`
-	RecieptNumber int    `json:"recieptNumber"`
+	RecieptNumber string    `json:"recieptNumber"`
 	Name          string `json:"name"`
-	Quantity      int    `json:"quantity"`
-	Price         int	 `json:"price"`
+	WorkItem      string `json"workItem"`
+	Quantity      string `json:"quantity"`
+	Price         string    `json:"price"`
 	}
 type Antena struct {
 	Name string
 	Price int
 }
-var aircon []*Aircon
 
+var airconList []*Aircon
 
 // 全アイテム取得
 func getAllData(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	json.NewEncoder(w).Encode(aircon)
+	json.NewEncoder(w).Encode(airconList)
 }
 
 // アイテム登録
@@ -41,12 +43,22 @@ func createData(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
 	reqBody,_ := ioutil.ReadAll(r.Body)
 
-	var item Aircon
-	if err := json.Unmarshal(reqBody, &item); err != nil {
+	// var list airconList
+	regBodyByte := []byte(reqBody)
+	
+	log.Println(string(reqBody))
+	log.Println(reqBody)
+	
+	var aircon Aircon
+	if err := json.Unmarshal(regBodyByte, &airconList); err != nil {
 		log.Fatal(err,"here")
 	}
-	aircon = append(aircon, &item)
-	json.NewEncoder(w).Encode(item)
+	airconList = append(airconList, &aircon)
+	log.Println(aircon)
+	// list = append(list, &aircon)
+
+	
+	
 }
 
 func handleCORS(handle http.Handler) http.Handler {
@@ -74,14 +86,14 @@ func StartWebServer() error {
 }
 
 func init(){
-	aircon = []*Aircon{
+	airconList = []*Aircon{
 		&Aircon{
 			Name: "標準工事",
-			Price: 10000,
+			Price: "10000",
 		},
 		&Aircon{
 			Name: "9.0kw工事",
-			Price: 15000,
+			Price: "15000",
 		},
 	}
 }
