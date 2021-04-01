@@ -20,7 +20,7 @@ type Aircon struct {
 	Name          string `json:"name"`
 	WorkItem      string `json"workItem"`
 	Quantity      string `json:"quantity"`
-	Price         string    `json:"price"`
+	Price         json.Number   `json:"price"`
 	}
 type Antena struct {
 	Name string
@@ -47,7 +47,7 @@ func createData(w http.ResponseWriter, r *http.Request){
 	regBodyByte := []byte(reqBody)
 	
 	log.Println(string(reqBody))
-	log.Println(reqBody)
+
 	
 	var aircon Aircon
 	if err := json.Unmarshal(regBodyByte, &airconList); err != nil {
@@ -88,10 +88,12 @@ func StartWebServer() error {
 func init(){
 	airconList = []*Aircon{
 		&Aircon{
+			CompletedDate: "2021/01/01",
 			Name: "標準工事",
 			Price: "10000",
 		},
 		&Aircon{
+			CompletedDate: "2021/01/02",
 			Name: "9.0kw工事",
 			Price: "15000",
 		},
